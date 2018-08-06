@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "containerGroups_taganomaly_name": {
+          "defaultValue": "taganomaly",
+          "type": "String"
+      }
+  },
+  "variables": {},
+  "resources": [
+      {
+          "comments": "Generalized from resource: '/subscriptions/73a4ea93-d914-424d-9e64-28adf397e8e3/resourceGroups/om-taga/providers/Microsoft.ContainerInstance/containerGroups/taganomaly'.",
+          "type": "Microsoft.ContainerInstance/containerGroups",
+          "name": "[parameters('containerGroups_taganomaly_name')]",
+          "apiVersion": "2018-04-01",
+          "location": "westeurope",
+          "scale": null,
+          "properties": {
+              "containers": [
+                  {
+                      "name": "[parameters('containerGroups_taganomaly_name')]",
+                      "properties": {
+                          "image": "omri374/taganomaly",
+                          "command": [],
+                          "ports": [
+                              {
+                                  "protocol": "TCP",
+                                  "port": 3838
+                              }
+                          ],
+                          "environmentVariables": [],
+                          "resources": {
+                              "requests": {
+                                  "memoryInGB": 4,
+                                  "cpu": 2
+                              }
+                          }
+                      }
+                  }
+              ],
+              "restartPolicy": "Always",
+              "ipAddress": {
+                  "ports": [
+                      {
+                          "protocol": "TCP",
+                          "port": 3838
+                      }
+                  ],
+                  "type": "Public",
+                  "dnsNameLabel": "[parameters('containerGroups_taganomaly_name')]"
+              },
+              "osType": "Linux"
+          },
+          "dependsOn": []
+      }
+  ]
+}

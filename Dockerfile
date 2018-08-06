@@ -1,0 +1,1 @@
+FROM colebrokamp/rize:latest
