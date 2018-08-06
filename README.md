@@ -6,8 +6,8 @@ Taganamoly is a tool for creating labeled data for anomaly detection models. It 
 #### Click here to deploy as Web App on Azure:
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/omri374/taganomaly)
 
-The app has three main windows:
-#### The labeling window
+The app has four main windows:
+### 1. The labeling window
 ![UI](https://github.com/Microsoft/taganomaly/raw/master/assets/ui.png)
 ###### Time series labeling
 ![Time series](https://github.com/Microsoft/taganomaly/raw/master/assets/ts.png)
@@ -19,21 +19,24 @@ The app has three main windows:
 ![Detailed data](https://github.com/Microsoft/taganomaly/raw/master/assets/detailed.png)
 
 
-#### Compare this category with others over time
+### 2. Compare this category with others over time
 ![Compare](https://github.com/Microsoft/taganomaly/raw/master/assets/compare.png)
 
-#### Look at proposed anomalies using the Twitter AnomalyDetection package
+### 3. Find proposed anomalies using the Twitter AnomalyDetection package
 ![Reference results](https://github.com/Microsoft/taganomaly/raw/master/assets/twitter.png)
 
-#### Look at the changes in distribution between categories
+### 4. Observe the changes in distribution between categories
 This could be useful to understand whether an anomaly was univariate or multivariate
 ![Distribution comparison](https://github.com/Microsoft/taganomaly/raw/master/assets/dist.png)
 
+## How to run locally:
+This tool uses the [shiny framework](https://shiny.rstudio.com/) for visualizing events.
+In order to run it, you need to have [R](https://mran.microsoft.com/download) and preferably [Rstudio](https://www.rstudio.com/products/rstudio/download/).
+Once you have everything installed, open the project on R studio and click "Run App", or call runApp() from the console. You might need to manually install the required packages
 
-
-## Requirements
+#### Requirements
 - R (3.4.0 or above)
-### Used packages: 
+#### Used packages: 
 - shiny
 - dplyr
 - gridExtra
@@ -41,22 +44,13 @@ This could be useful to understand whether an anomaly was univariate or multivar
 - DT
 - ggplot2
 
-
-packages will be installed upon start if missing (see [global.R]). This might take a few minutes upon the first run.
-
-## How to run locally:
-This tool uses the [shiny framework](https://shiny.rstudio.com/) for visualizing events.
-In order to run it, you need to have [R](https://mran.microsoft.com/download) and preferably [Rstudio](https://www.rstudio.com/products/rstudio/download/).
-Once you have everything installed, open the project on R studio and click "Run App", or call runApp() from the console. You might need to manually install the required packages
-
 ## How to deploy using docker:
 Option 1: [Deploy to Azure Web App for Containers](https://azuredeploy.net/). More details [here](https://azure.microsoft.com/en-us/services/app-service/containers/)
 
 Option 2: Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
 
-### Dockerize the shiny app yourself:
+### Dockerize the shiny app:
 Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deploy on shiny-server. Default port is 3838, so make sure you have it open or change the default port to something else.
-
 
 ## Instructions of use
 1. Import time series CSV file. Assumed structure:
@@ -83,7 +77,6 @@ Optional (2): Open the "All Categories" tab to see how other time series behave 
 
 #### Current limitations/issues
 It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files aren't supposed to override each other.
-
 
 # Contributing
 
