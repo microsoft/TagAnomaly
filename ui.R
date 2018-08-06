@@ -58,10 +58,12 @@ body <- dashboardBody(
   tabsetPanel(
     tabPanel("Current category",
              h2('Time Series for labeling:'),
+             h5("Graph might take a few moments to load"),
              plotOutput("plot", brush = "user_brush"),
              h2('Selected points:'),
              dataTableOutput("summaryTable"),
              h2('Inspect raw data:'),
+             h5('Select a point or more on the graph, then select a record on the \"Selected Points\" table to see raw data'),
              dataTableOutput("rawtable")
     ),
     tabPanel('All categories',
@@ -88,5 +90,5 @@ body <- dashboardBody(
 )
 
 
-dashboardPage(header, sidebar, body)
+dashboardPage(header, sidebar, body,skin = "red")
 

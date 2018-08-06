@@ -6,6 +6,5 @@ if(!require(gridExtra)) install.packages('gridExtra')
 if(!require(shinydashboard)) install.packages('shinydashboard')
 if(!require(parsedate)) install.packages('parsedate')
 if(!require(AnomalyDetection)) devtools::install_github('twitter/AnomalyDetection')
-#if(!require(prophet)) install.packages('prophet')
 
 
