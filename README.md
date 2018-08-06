@@ -8,26 +8,26 @@ Taganamoly is a tool for creating labeled data for anomaly detection models. It 
 
 The app has three main windows:
 #### The labeling window
-![UI](https://github.com/omri374/taganomaly/raw/master/assets/ui.png)
+![UI](https://github.com/Microsoft/taganomaly/raw/master/assets/ui.png)
 ###### Time series labeling
-![Time series](https://github.com/omri374/taganomaly/raw/master/assets/ts.png)
+![Time series](https://github.com/Microsoft/taganomaly/raw/master/assets/ts.png)
 
 ###### Selected points table view
-![Selected points](https://github.com/omri374/taganomaly/raw/master/assets/selected.png)
+![Selected points](https://github.com/Microsoft/taganomaly/raw/master/assets/selected.png)
 
 ###### View raw data for window (if exists)
-![Detailed data](https://github.com/omri374/taganomaly/raw/master/assets/detailed.png)
+![Detailed data](https://github.com/Microsoft/taganomaly/raw/master/assets/detailed.png)
 
 
 #### Compare this category with others over time
-![Compare](https://github.com/omri374/taganomaly/raw/master/assets/compare.png)
+![Compare](https://github.com/Microsoft/taganomaly/raw/master/assets/compare.png)
 
 #### Look at proposed anomalies using the Twitter AnomalyDetection package
-![Reference results](https://github.com/omri374/taganomaly/raw/master/assets/twitter.png)
+![Reference results](https://github.com/Microsoft/taganomaly/raw/master/assets/twitter.png)
 
 #### Look at the changes in distribution between categories
 This could be useful to understand whether an anomaly was univariate or multivariate
-![Distribution comparison](https://github.com/omri374/taganomaly/raw/master/assets/dist.png)
+![Distribution comparison](https://github.com/Microsoft/taganomaly/raw/master/assets/dist.png)
 
 
 
