@@ -3,7 +3,7 @@ Anomaly detection labeling tool, specifically for multiple time series (one time
 
 Taganamoly is a tool for creating labeled data for anomaly detection models. It allows the labeler to select points on a time series, further inspect them by looking at the behavior of other times series at the same time range, or by looking at the raw data that created this time series (assuming that the time series is an aggregated metric, counting events per time range)
 
-#### Click here to deploy as Web App on Azure:
+#### Click here to deploy on Azure using [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/):
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/omri374/taganomaly)
 
 The app has four main windows:
@@ -45,7 +45,7 @@ Once you have everything installed, open the project on R studio and click "Run 
 - ggplot2
 
 ## How to deploy using docker:
-Option 1: [Deploy to Azure Web App for Containers](https://azuredeploy.net/). More details [here](https://azure.microsoft.com/en-us/services/app-service/containers/)
+Option 1: [Deploy to Azure Web App for Containers or Azure Container Instances](https://azuredeploy.net/). More details [here (webapp)](https://azure.microsoft.com/en-us/services/app-service/containers/) and [here (container instances)](https://azure.microsoft.com/en-us/services/container-instances/)
 
 Option 2: Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
 
@@ -54,19 +54,19 @@ Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deplo
 
 ## Instructions of use
 1. Import time series CSV file. Assumed structure:
-- date ("%Y-%m-%d %H:%M:%S")
-- category
+- date ("%Y-%m-%d %H:%M:%S"). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
+- category (optional)
 - value
 
 2. (Optional) Import raw data time series CSV file.
 
 If the original time series is an aggreation over time windows, this time series is the raw values themselves. This way we could dive deeper into an anomalous value and see what it is comprised of.
 Assumed structure:
-- date ("%Y-%m-%d %H:%M:%S")
-- category
+- date ("%Y-%m-%d %H:%M:%S"). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
+- category (optional)
 - value
 
-2. Select category (if exists)
+2. Select category (optional, if exists)
 
 3. Select time range on slider
 
