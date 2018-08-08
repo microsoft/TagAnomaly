@@ -38,6 +38,7 @@ sidebar <- dashboardSidebar(
                 "text/comma-separated-values,text/plain",
                 ".csv")
     ),
+    #checkboxInput("header","My dataset has headers",value=TRUE),
     fileInput("rawfile", "Choose CSV File with raw data",
               accept = c(
                 "text/csv",
@@ -46,7 +47,7 @@ sidebar <- dashboardSidebar(
     ),
     uiOutput("category"),
     checkboxInput('interpolate',label = "Interpolate missing points",value = FALSE),
-    selectInput('breaks',"Select graph breaks",choices = c('1 sec','1 min','1 hour','1 day','1 week','1 month','1 year'),selected = '1 hour'),
+    selectInput('breaks',"Select graph breaks",choices = c('1 sec','1 min','1 hour','1 day','1 week','1 month','1 year'),selected = '1 year'),
     uiOutput('slider'),
     
     downloadButton(outputId = "mydownload", label = "Download labels set")

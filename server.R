@@ -20,26 +20,70 @@ server <- function(input,output, session) {
   # A numeric holding the time series gap (difference between two consecutive samples) as inferred from the provided dataset
   timeSeriesGap <- reactiveVal(value = 12*60*60,label='timeSeriesGap')
   
+  # Whether the first column holds a numeric value (TRUE), or a date value (FALSE)
+  numericTimestamp <- reactiveVal(value = F,label = 'numericTimestamp')
   
   ####---- Time-Series data handling ----####
   
+  ## Read CSV input file
+  tryReadFile <- function() {
+    out <- tryCatch(
+      {
+        read.csv(input$timeseriesfile$datapath,stringsAsFactors = F)
+      },
+      error=function(cond) {
+        message("Failed to load file. Message:")
+        message(cond)
+        return(NULL)
+      },
+      warning=function(cond) {
+        message("Warning:")
+        message(cond)
+        return(NULL)
+      }
+    )    
+    return(out)
+  }
+  
   ## Get time-series dataset from file upload
-  getTimeSeriesDataset <- reactive({
+  getDataset <- reactive({
     if(is.null(input$timeseriesfile)) return(NULL)
     
-    dataset <- read.csv(input$timeseriesfile$datapath,stringsAsFactors = F)
+    dataset <- tryReadFile()
     
-    ## Parse date to POSIXct
-    dataset$new_date <- as.POSIXct(dataset$date,tz = 'UTC',format = '%Y-%m-%d %H:%M:%S')
+    validate(
+      need(nrow(dataset) > 0, "Input file is empty"),
+      need(('date' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to date"),
+      need(('value' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to value")
+      
+    )
+    dataset
+  })
+  
+  
+  getTimeSeriesDataset <- reactive({
+    dataset <- getDataset()
+    if(is.null(dataset)) return(NULL)
     
-    ## If parsing failed, use parsedate to automatically parse the input date
-    if(all(is.na(dataset$new_date))){
-      warning('Error parsing date column, using parsedate to try parsing the date')
-      library(parsedate)
-      dataset$date <- parse_date(dataset$date)
-    } else{
-      dataset$date <- dataset$new_date
-      dataset$new_date <- NULL
+    if(is.numeric(dataset$date)){
+      numericTimestamp(TRUE)
+      
+    }
+    else{
+      
+      ## Parse date to POSIXct
+      dataset$new_date <- as.POSIXct(dataset$date,tz = 'UTC',format = '%Y-%m-%d %H:%M:%S')
+      
+      ## If parsing failed, use parsedate to automatically parse the input date
+      if(all(is.na(dataset$new_date))){
+        warning('Error parsing date column, using parsedate to try parsing the date')
+        library(parsedate)
+        dataset$date <- parse_date(dataset$date)
+      } else{
+        dataset$date <- dataset$new_date
+        dataset$new_date <- NULL
+      }
+      
     }
     
     ## Check whether the time series has multiple categories
@@ -70,13 +114,16 @@ server <- function(input,output, session) {
   
   ## Get a dataset for a specific category
   getCategoryDataset <- reactive({
+    ts <- getTimeSeriesDataset()
+    if(is.null(ts)) return(NULL)
+    
     if(hasCategories()==FALSE){
-      return(getTimeSeriesDataset())
+      return(ts)
     }
     cate <- input$category
     if(is.null(cate)) return(NULL)
     
-    dataset <- getTimeSeriesDataset() %>% filter(category == cate)
+    dataset <- ts %>% filter(category == cate)
     dataset
   })
   
@@ -106,20 +153,22 @@ server <- function(input,output, session) {
     cate <- input$category
     
     if(is.null(input$rawfile)) return(NULL)
-    
-    raw <- read.csv(input$rawfile$datapath,stringsAsFactors = F)
-    raw$new_date <- as.POSIXct(strptime(raw$date,format = "%Y-%m-%d %H:%M:%S",tz = 'UTC'))
-    
-    ## If parsing failed, use parsedate to automatically parse the input date
-    if(all(is.na(raw$new_date))){
-      warning('Error parsing date column, using parsedate to try parsing the date')
-      library(parsedate)
-      raw$date <- parse_date(raw$date)
-    } else{
-      raw$date <- raw$new_date
-      raw$new_date <- NULL
+    raw <- withProgress({
+      read.csv(input$rawfile$datapath,stringsAsFactors = F)
+    },message = "loading raw data file")
+    if(!numericTimestamp()){
+      raw$new_date <- as.POSIXct(strptime(raw$date,format = "%Y-%m-%d %H:%M:%S",tz = 'UTC'))
+      
+      ## If parsing failed, use parsedate to automatically parse the input date
+      if(all(is.na(raw$new_date))){
+        warning('Error parsing date column, using parsedate to try parsing the date')
+        library(parsedate)
+        raw$date <- parse_date(raw$date)
+      } else{
+        raw$date <- raw$new_date
+        raw$new_date <- NULL
+      }
     }
-    
     if(hasCategories()){
       raw <- raw %>% filter(category == cate)
     }
@@ -198,20 +247,27 @@ server <- function(input,output, session) {
     if(is.null(dataset)) return(NULL)
     dataset <- dataset %>% arrange(date)
     
-    mini = as.POSIXct(min(dataset$date),origin = '1970-01-01',tz = 'UTC')
-    maxi = as.POSIXct(max(dataset$date),origin = '1970-01-01',tz = 'UTC')
-    
-    sliderInput("slider","Time range",min = mini,max = maxi,value = c(mini,maxi),step = 1,width = 400)
+    if(numericTimestamp()){
+      mini = min(dataset$date)
+      maxi = max(dataset$date)
+    } else{
+      mini = as.POSIXct(min(dataset$date),origin = '1970-01-01',tz = 'UTC')
+      maxi = as.POSIXct(max(dataset$date),origin = '1970-01-01',tz = 'UTC')
+    }
+    sliderInput("slider","Time range",min = mini-1,max = maxi+1,value = c(mini-1,maxi+1),step = 1,width = 400)
   })
   
   
   ## Select input for categories, based on the categories found in the time series dataset
   output$category <- renderUI({
-    req(input$timeseriesfile)
-    dataset <- getTimeSeriesDataset()
-    dataset <- dataset %>% filter(category != '0' & category != 0)
-    if(is.null(dataset)) return("")
-    selectInput("category", "Choose category:", as.list(unique(dataset$category)),selected = unique(dataset$category)[1],multiple = F) 
+    if(hasCategories()==TRUE){
+      req(input$timeseriesfile)
+      dataset <- getTimeSeriesDataset()
+      if(is.null(dataset)) return("")
+      selectInput("category", "Choose category:", as.list(unique(dataset$category)),selected = unique(dataset$category)[1],multiple = F) 
+    } else{
+      return(NULL)
+    }
   })
   
   ####---- Plots ----####
@@ -222,8 +278,16 @@ server <- function(input,output, session) {
       categoryDataset <- getTimeFilteredCategoryDataset()
       if(is.null(categoryDataset)) return(NULL)
       
-      ggplot(categoryDataset, aes(date, value)) + geom_point(size = 3) + geom_line() + 
-        scale_y_continuous(labels = scales::comma) + scale_x_datetime(date_breaks = input$breaks) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+      if(numericTimestamp()){
+        ggplot(categoryDataset, aes(date, value)) + geom_point(size = 3) + geom_line() + 
+          scale_y_continuous(labels = scales::comma) + 
+          theme(axis.text.x = element_text(angle = 90, hjust = 1))
+      } else{
+        ggplot(categoryDataset, aes(date, value)) + geom_point(size = 3) + geom_line() + 
+          scale_y_continuous(labels = scales::comma) + 
+          scale_x_datetime(date_breaks = input$breaks) + 
+          theme(axis.text.x = element_text(angle = 90, hjust = 1))
+      }
     },message = "Rendering plot...")
   })
   
@@ -233,7 +297,13 @@ server <- function(input,output, session) {
   ## Capture the selected points on the graph
   selectedPoints <- reactive({
     user_brush <- input$user_brush
-    brushedPoints(getTimeFilteredCategoryDataset(), user_brush, xvar = "date", yvar = "value")
+    pts <- brushedPoints(getTimeFilteredCategoryDataset(), user_brush, xvar = "date", yvar = "value")
+    if(is.null(pts)) return(NULL)
+    if(hasCategories()){
+      pts %>% select(date, category, value)
+    } else {
+      pts %>% select(date, value)
+    }
   })
   
   ## Plot showing all categories
@@ -267,15 +337,25 @@ server <- function(input,output, session) {
       scale_y_continuous(labels = scales::comma) +
       theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())
     
-    
-    allplot <- dataset %>%
-      ggplot(aes(date, value)) + 
-      geom_line(stat="identity") + 
-      facet_grid(category ~. , scales = 'free') + 
-      theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-      ggtitle(paste0("All other categories with more than ",input$minPerCategory, " values")) +
-      scale_y_continuous(labels = scales::comma) + scale_x_datetime(date_breaks = input$breaks)
-    
+    if(numericTimestamp()){
+      allplot <- dataset %>%
+        ggplot(aes(date, value)) + 
+        geom_line(stat="identity") + 
+        facet_grid(category ~. , scales = 'free') + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+        ggtitle(paste0("All other categories with more than ",input$minPerCategory, " values")) +
+        scale_y_continuous(labels = scales::comma)
+    } else{
+      
+      allplot <- dataset %>%
+        ggplot(aes(date, value)) + 
+        geom_line(stat="identity") + 
+        facet_grid(category ~. , scales = 'free') + 
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+        ggtitle(paste0("All other categories with more than ",input$minPerCategory, " values")) +
+        scale_y_continuous(labels = scales::comma) + 
+        scale_x_datetime(date_breaks = input$breaks)
+    }
     grid.arrange(thisplot, allplot, ncol = 1,nrow = 2,heights = c(200,1000))
     
   }, height = 1200)
@@ -303,20 +383,27 @@ server <- function(input,output, session) {
       filter(category %in% unique(c(categories,input$category)))
     
     if(nrow(dataset) == 0) stop('no data found')
-    
-    ggplot(dataset,aes(x = date, y = value,fill = category)) + 
-      ggtitle("Distribution of counts per category") + 
-      geom_bar(position = "fill",stat = "identity") + 
-      scale_x_datetime(date_breaks = input$breaks) + 
-      scale_colour_gradientn(colours=rainbow(4)) + 
-      coord_flip()
-    
+    if(numericTimestamp()){
+      ggplot(dataset,aes(x = date, y = value,fill = category)) + 
+        ggtitle("Distribution of counts per category") + 
+        geom_bar(position = "fill",stat = "identity") + 
+        scale_colour_gradientn(colours=rainbow(4)) + 
+        coord_flip()      
+    } else{
+      ggplot(dataset,aes(x = date, y = value,fill = category)) + 
+        ggtitle("Distribution of counts per category") + 
+        geom_bar(position = "fill",stat = "identity") + 
+        scale_x_datetime(date_breaks = input$breaks) + 
+        scale_colour_gradientn(colours=rainbow(4)) + 
+        coord_flip()
+    }
   }, height = 1200)
   
-  output$summaryTable <- DT::renderDataTable(expr = {DT::datatable(selectedPoints())}, selection = 'single',server = F)
+  output$summaryTable <- DT::renderDataTable(expr = selectedPoints(), selection = 'single',server = F)
   
   
-  data_to_display<-eventReactive(input$summaryTable_rows_selected,ignoreNULL=TRUE,
+  data_to_display<-eventReactive(input$summaryTable_rows_selected,
+                                 ignoreNULL=TRUE,
                                  getRawDataForSample()
   )
   
@@ -335,8 +422,11 @@ server <- function(input,output, session) {
     withProgress({
       source("R/anomaly_detection.R")
       dataset <- getTimeFilteredCategoryDataset()
+      if(numericTimestamp()){
+        dataset$date <- as.POSIXct(dataset$date,tz="UTC",origin="1970-01-01")
+      }
       if(is.null(dataset)) stop('no dataset found.')
-      res <- find_anomalies_twitter(dataset)
+      res <- find_anomalies_twitter(dataset,is_ts = !numericTimestamp())
       res$plot
     },message = 'Finding anomalies...')
   })
@@ -348,7 +438,12 @@ server <- function(input,output, session) {
   output$mydownload <- downloadHandler(
     filename = function(){
       random_string <- paste0(paste0(sample(LETTERS,2 , TRUE),collapse=''),sample(999, 1, TRUE), paste0(sample(LETTERS,2 , TRUE),collapse=''),collapse = '')
-      paste0(gsub(".csv",replacement = "",input$timeseriesfile$name),'-',input$category,'-',random_string,'-labels.csv')
+      
+      if(hasCategories()){
+        paste0(gsub(".csv",replacement = "",input$timeseriesfile$name),'-',input$category,'-',random_string,'-labels.csv')
+      } else{
+        paste0(gsub(".csv",replacement = "",input$timeseriesfile$name),'-',random_string,'-labels.csv')
+      }
     },
     content = function(file) {
       write.csv(selectedPoints(),file)
