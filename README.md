@@ -76,7 +76,7 @@ Optional (2): Open the "All Categories" tab to see how other time series behave 
 5. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.
 
 #### Current limitations/issues
-It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files aren't supposed to override each other.
+It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files won't override each other. Once labeling is finished, one option is to run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
 
 # Contributing
 
