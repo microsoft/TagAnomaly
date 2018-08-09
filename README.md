@@ -64,7 +64,7 @@ If the original time series is an aggreation over time windows, this time series
 Assumed structure:
 - date ("%Y-%m-%d %H:%M:%S"). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
 - category (optional)
-- value
+- content
 
 2. Select category (optional, if exists)
 
