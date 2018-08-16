@@ -73,6 +73,7 @@ Assumed structure:
 4.Select points on plot that look anomalous.
 Optional (1): click on one time range on the table below the plot to see raw data on this time range
 Optional (2): Open the "All Categories" tab to see how other time series behave on the same time range.
+
 5. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.
 
 #### Current limitations/issues
