@@ -32,7 +32,7 @@ This could be useful to understand whether an anomaly was univariate or multivar
 ## How to run locally:
 This tool uses the [shiny framework](https://shiny.rstudio.com/) for visualizing events.
 In order to run it, you need to have [R](https://mran.microsoft.com/download) and preferably [Rstudio](https://www.rstudio.com/products/rstudio/download/).
-Once you have everything installed, open the project on R studio and click "Run App", or call runApp() from the console. You might need to manually install the required packages
+Once you have everything installed, open the project on R studio and click `Run App`, or call runApp() from the console. You might need to manually install the required packages
 
 #### Requirements
 - R (3.4.0 or above)
@@ -51,11 +51,11 @@ Option 1: [Deploy to Azure Web App for Containers or Azure Container Instances](
 Option 2: Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
 
 ### Dockerize the shiny app:
-Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deploy on shiny-server. Default port is 3838, so make sure you have it open or change the default port to something else.
+Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deploy on shiny-server. Default port is `3838`, so make sure you have it open or change the default port to something else.
 
 ## Instructions of use
 1. Import time series CSV file. Assumed structure:
-- date ("%Y-%m-%d %H:%M:%S"). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
+- date (`"%Y-%m-%d %H:%M:%S"`). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
 - category (optional)
 - value
 
@@ -63,7 +63,7 @@ Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deplo
 
 If the original time series is an aggreation over time windows, this time series is the raw values themselves. This way we could dive deeper into an anomalous value and see what it is comprised of.
 Assumed structure:
-- date ("%Y-%m-%d %H:%M:%S"). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
+- date (`"%Y-%m-%d %H:%M:%S"`). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
 - category (optional)
 - content
 
@@ -71,11 +71,10 @@ Assumed structure:
 
 3. Select time range on slider
 
-4.Select points on plot that look anomalous.
+4. Select points on plot that look anomalous.
 Optional (1): click on one time range on the table below the plot to see raw data on this time range
-Optional (2): Open the "All Categories" tab to see how other time series behave on the same time range.
-
-5. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.
+Optional (2): Open the `All Categories` tab to see how other time series behave on the same time range.
+5. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on `Download labels set` and continue to the next category.
 
 #### Current limitations/issues
 It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files won't override each other. Once labeling is finished, one option is to run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
