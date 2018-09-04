@@ -1,3 +1,6 @@
+## ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `TagAnomaly will be back online shortly`
+
+
 # taganomaly
 Anomaly detection labeling tool, specifically for multiple time series (one time series per category).
 
@@ -78,7 +81,6 @@ Optional (2): Open the `All Categories` tab to see how other time series behave 
 
 #### Current limitations/issues
 It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files won't override each other. Once labeling is finished, one option is to run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
-
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
