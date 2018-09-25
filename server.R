@@ -45,6 +45,21 @@ server <- function(input,output, session) {
     return(out)
   }
   
+  padMissingDates <- function(dataset,padValue = 0, timeSeriesGapValue){
+    category <- dataset[1,'category'] %>% unlist()
+    
+    pad <- data.frame(date = seq(from = min(dataset$date),to = max(dataset$date),by = timeSeriesGapValue))
+    
+    full_df <- full_join(dataset,pad) %>% mutate_all(funs(ifelse(is.na(.),padValue,.)))%>% arrange(date)
+    
+    full_df$date <- as.POSIXct(full_df$date,tz='UTC',origin = "1970-01-01")
+    full_df$category <- category
+    full_df$sampleId <- ifelse(full_df$sampleId == 0,NA,full_df$sampleId)
+    dataset <- full_df
+    
+    dataset
+  }
+  
   ## Get time-series dataset from file upload
   getDataset <- reactive({
     if(is.null(input$timeseriesfile)) return(NULL)
@@ -81,8 +96,10 @@ server <- function(input,output, session) {
         dataset$date <- parse_date(dataset$date)
       } else{
         dataset$date <- dataset$new_date
-        dataset$new_date <- NULL
+        
       }
+      
+      dataset$new_date <- NULL
       
     }
     
@@ -100,14 +117,7 @@ server <- function(input,output, session) {
       gap <- diff(as.numeric(oneCategory$date))[1]
       timeSeriesGap(gap)
     }
-    
-    ## Fill missing values in time series if requested (Fill with 0 dates in which no value exists)
-    if(input$interpolate){
-      pad <- data.frame(date = seq(from = min(dataset$date),to = max(dataset$date),by = timeSeriesGap()))
-      full_df <- full_join(dataset,pad) %>% mutate_each(funs(ifelse(is.na(.),0,.)))%>% arrange(date)
-      full_df$date <- as.POSIXct(full_df$date,tz='UTC',origin = "1970-01-01")
-      dataset <- full_df
-    }
+
     dataset$sampleId <- 1:nrow(dataset)
     dataset
   })
@@ -124,6 +134,12 @@ server <- function(input,output, session) {
     if(is.null(cate)) return(NULL)
     
     dataset <- ts %>% filter(category == cate)
+    
+    ## Fill missing values in time series if requested (Fill with 0 dates in which no value exists)
+    if(input$interpolate){
+      dataset <- padMissingDates(dataset,timeSeriesGapValue = timeSeriesGap())
+    }
+    
     dataset
   })
   
@@ -426,7 +442,14 @@ server <- function(input,output, session) {
         dataset$date <- as.POSIXct(dataset$date,tz="UTC",origin="1970-01-01")
       }
       if(is.null(dataset)) stop('no dataset found.')
-      res <- find_anomalies_twitter(dataset,is_ts = !numericTimestamp())
+      res <- find_anomalies_twitter(dataset,
+                                    is_ts = !numericTimestamp(),
+                                    threshold = input$twitterThreshold,
+                                    alpha = input$twitterAlpha, 
+                                    direction = input$twitterDirection)
+      if(is.null(res$plot)){
+        stop("No anomalies found")
+      }
       res$plot
     },message = 'Finding anomalies...')
   })

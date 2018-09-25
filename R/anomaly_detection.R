@@ -1,5 +1,5 @@
 ### This function return anomalizes based on Twitter's module found in https://github.com/twitter/AnomalyDetection
-find_anomalies_twitter <- function(categoryDataset,is_ts = TRUE){
+find_anomalies_twitter <- function(categoryDataset,is_ts = TRUE,threshold="p95",alpha=0.05,direction="pos"){
   
   library(AnomalyDetection)
   library(dplyr)
@@ -8,8 +8,31 @@ find_anomalies_twitter <- function(categoryDataset,is_ts = TRUE){
     {
       categoryDataset <- categoryDataset %>% select(date, value)
       print(paste0("Performing anomaly detection... is_ts = ",is_ts))
-      if(is_ts) AnomalyDetectionTs(categoryDataset, threshold='p95', direction='pos', plot=TRUE, title='Anomalies found using Twitter\'s anomaly detection.')
-      if(!is_ts) AnomalyDetectionVec(categoryDataset$value, threshold='p95', direction='pos', period = 1440,plot=TRUE, title='Anomalies found using Twitter\'s anomaly detection with a period value of 1440.')
+      if(is_ts) {
+        res <- AnomalyDetectionTs(categoryDataset, 
+                                  threshold = threshold, 
+                                  direction=direction,
+                                  alpha = alpha, 
+                                  plot=TRUE, 
+                                  title='Anomalies found using Twitter\'s anomaly detection.')
+      } else{ 
+        res <- AnomalyDetectionVec(categoryDataset$value, 
+                                   threshold=  threshold, 
+                                   direction = direction,
+                                   alpha = alpha, 
+                                   period = 1440,
+                                   plot=TRUE, 
+                                   title='Anomalies found using Twitter\'s anomaly detection with a period value of 1440.')
+      }
+      
+      if(is.null(res$plot)){
+        res$plot <- ggplot(categoryDataset, aes(date, value)) + geom_line(colour='red',size=0.5)  + 
+          scale_y_continuous(labels = scales::comma) + theme_bw() + 
+          theme(axis.text.x = element_text(angle = 90, hjust = 1),panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+          ggtitle("No anomalies found. Original dataset plot")
+      }
+      
+      res
     },
     error=function(cond) {
       message("Failed to run the Twitter Anomaly Detection model. Message:")
@@ -19,7 +42,6 @@ find_anomalies_twitter <- function(categoryDataset,is_ts = TRUE){
     warning=function(cond) {
       message("Warning while running the Twitter Anomaly Detection model. message:")
       message(cond)
-      return(NULL)
     }
   )
   

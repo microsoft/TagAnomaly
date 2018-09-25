@@ -31,7 +31,9 @@ header <- dashboardHeader(title = 'Taganomaly - Anomaly detection labeling tool'
 )
 
 sidebar <- dashboardSidebar(
+
   sidebarMenu(
+    tags$style(".skin-red .sidebar a { color: #444; }"),
     fileInput("timeseriesfile", "Choose CSV File with counts per time frame",
               accept = c(
                 "text/csv",
@@ -81,7 +83,13 @@ body <- dashboardBody(
              h3("Based on Twitter's AnomalyDetection package:"),
              a('https://github.com/twitter/AnomalyDetection/', href = 'https://github.com/twitter/AnomalyDetection/'),
              h5("Might take a while to load..."),
-             plotOutput('twitteranomalies')
+             plotOutput('twitteranomalies'),
+             fluidRow(
+               column(2, selectInput("twitterThreshold",label="Threshold",choices=c("None", "med_max", "p95", "p99"),selected = "p95")),
+               column(2, selectInput("twitterDirection",label="Direction",choices=c("pos", "neg", "both"),selected='pos')),
+               column(2, numericInput("twitterAlpha","Alpha value",min=0,max=1,step=0.05,value=0.05))
+               )
+             
              
     )
   )
