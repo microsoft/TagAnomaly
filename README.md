@@ -1,6 +1,3 @@
-## ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `TagAnomaly will be back online shortly`
-
-
 # taganomaly
 Anomaly detection labeling tool, specifically for multiple time series (one time series per category).
 
