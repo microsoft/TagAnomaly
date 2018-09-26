@@ -44,6 +44,7 @@ Once you have everything installed, open the project on R studio and click `Run 
 - DT
 - ggplot2
 - shinythemes
+- AnomalyDetection
 
 ## How to deploy using docker:
 Option 1: [Deploy to Azure Web App for Containers or Azure Container Instances](https://azuredeploy.net/). More details [here (webapp)](https://azure.microsoft.com/en-us/services/app-service/containers/) and [here (container instances)](https://azure.microsoft.com/en-us/services/container-instances/)
