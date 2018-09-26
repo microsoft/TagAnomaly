@@ -295,14 +295,14 @@ server <- function(input,output, session) {
       if(is.null(categoryDataset)) return(NULL)
       
       g <- ggplot(categoryDataset, aes(date, value))+ geom_line(size=0.25,color="#D55E00") + geom_point(size = 0.5,shape=21,alpha=0.7)  + 
-        scale_y_continuous(labels = scales::comma) + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1),
-              panel.grid.minor = element_blank(), 
-              text = element_text(size = 14)) + theme_bw()
-      
+        scale_y_continuous(labels = scales::comma) + theme_bw()
       if(!numericTimestamp()){
         g <- g +  scale_x_datetime(date_breaks = input$breaks)
       }
+      g <- g + theme(axis.text.x = element_text(angle = 90, hjust = 1),
+                       panel.grid.minor = element_blank(), 
+                       text = element_text(size = 14))
+      
       g
     },message = "Rendering plot...")
   })
