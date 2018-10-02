@@ -6,10 +6,10 @@ library(shinydashboard)
 
 header <- dashboardHeader(title = 'Taganomaly - Anomaly detection labeling tool',
                           dropdownMenu(
-                            type = "notifications", 
+                            type = "notifications",
                             icon = icon("question-circle"),
                             badgeStatus = NULL,
-                            headerText = 
+                            headerText =
                               helpText(HTML('<U>Instructions:</U> <P>
                 <B>1. Import time series CSV file</B>. Assumed structure: <BR>
                           - date ("%Y-%m-%d %H:%M:%S")<BR>
@@ -51,7 +51,7 @@ sidebar <- dashboardSidebar(
     checkboxInput('interpolate',label = "Interpolate missing points",value = FALSE),
     selectInput('breaks',"Select graph breaks",choices = c('1 sec','1 min','1 hour','1 day','1 week','1 month','1 year'),selected = '1 year'),
     uiOutput('slider'),
-    
+
     downloadButton(outputId = "mydownload", label = "Download labels set")
   )
 )
@@ -89,15 +89,14 @@ body <- dashboardBody(
                column(2, selectInput("twitterDirection",label="Direction",choices=c("pos", "neg", "both"),selected='pos')),
                column(2, numericInput("twitterAlpha","Alpha value",min=0,max=1,step=0.05,value=0.05))
                )
-             
-             
+
+
     )
   )
-  
-  
-  
+
+
+
 )
 
 
 dashboardPage(header, sidebar, body,skin = "red")
-
