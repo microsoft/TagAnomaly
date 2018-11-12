@@ -69,7 +69,7 @@ server <- function(input,output, session) {
     validate(
       need(nrow(dataset) > 0, "Input file is empty"),
       need(('date' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to date"),
-      need(('value' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to value")
+      need(('value' %in% names(dataset)),"value column not found. Consider renaming your value column to value")
       
     )
     dataset
