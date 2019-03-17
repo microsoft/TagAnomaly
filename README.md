@@ -1,6 +1,9 @@
 # taganomaly
 Anomaly detection labeling tool, specifically for multiple time series (one time series per category).
 
+## Note: 
+**This tool was built as a part of an [engagement](https://www.microsoft.com/developerblog/2019/01/02/real-time-time-series-analysis-at-scale-for-trending-topics-detection/), and is not maintained on a regular basis.**
+
 Taganomaly is a tool for creating labeled data for anomaly detection models. It allows the labeler to select points on a time series, further inspect them by looking at the behavior of other times series at the same time range, or by looking at the raw data that created this time series (assuming that the time series is an aggregated metric, counting events per time range)
 
 #### Click here to deploy on Azure using [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/):
