@@ -55,7 +55,22 @@ Option 1: [Deploy to Azure Web App for Containers or Azure Container Instances](
 Option 2: Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
 
 ### Dockerize the shiny app:
-Follow the steps on [rize](https://github.com/cole-brokamp/rize) on how to deploy on shiny-server. Default port is `3838`, so make sure you have it open or change the default port to something else.
+In order to build a new Docker image, run the following commands from the root folder of the project:
+
+```sh
+sudo docker build -t taganomaly .
+```
+
+If you added new packages to your modified TagAnomaly version, make sure to specify these in the Dockerfile.
+
+Once the docker image is built, run it by calling
+
+```sh
+docker run -p 3838:3838 taganomaly
+```
+
+Which would result in the shiny server app running on port 3838.
+
 
 ## Instructions of use
 1. Import time series CSV file. Assumed structure:
