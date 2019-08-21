@@ -10,9 +10,5 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: docker build -t $(dockerId)/$(imageName) .
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- script: docker build -t $omri374/$taganomaly .
+  displayName: 'Build docker'
