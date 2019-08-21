@@ -10,5 +10,5 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: docker build -t $omri374/$taganomaly .
+- script: docker build -t omri374/taganomaly .
   displayName: 'Build docker'
