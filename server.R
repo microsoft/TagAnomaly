@@ -5,7 +5,6 @@ library(parsedate) # for cases when the provided date wasn't in a specific patte
 library(DT) 
 library(ggplot2) 
 
-
 ## Extend the max file upload size
 options(shiny.maxRequestSize=150*1024^2)
 
@@ -22,6 +21,23 @@ server <- function(input,output, session) {
   
   # Whether the first column holds a numeric value (TRUE), or a date value (FALSE)
   numericTimestamp <- reactiveVal(value = F,label = 'numericTimestamp')
+  
+  selectedPoints <- reactiveVal(value = data.frame(),label='selectedPoints')
+  brushed <- reactive(brushedPoints(getTimeFilteredCategoryDataset(), input$user_brush))
+  
+  observeEvent(input$add, {
+    selectedPoints(selectedPoints() %>% bind_rows(brushed()))
+  })
+  
+  observeEvent(input$delete, {
+    if (dim(selectedPoints())[1] > 0) {
+      selectedPoints(selectedPoints()%>% anti_join(brushed()))
+    }
+  })
+  
+  observeEvent(input$category,{
+    brushed(NULL)
+  })
   
   ####---- Time-Series data handling ----####
   
@@ -62,9 +78,10 @@ server <- function(input,output, session) {
   
   ## Get time-series dataset from file upload
   getDataset <- reactive({
-    if(is.null(input$timeseriesfile)) return(NULL)
     
+    if(is.null(input$timeseriesfile)) return(NULL)
     dataset <- tryReadFile()
+    
     
     validate(
       need(nrow(dataset) > 0, "Input file is empty"),
@@ -303,6 +320,12 @@ server <- function(input,output, session) {
                        panel.grid.minor = element_blank(), 
                        text = element_text(size = 14))
       
+
+      
+      if (dim(selectedPoints())[1] > 0) {
+        g <- g + geom_point(aes(date, value), data = selectedPoints(), color = "red")
+      } 
+      
       g
     },message = "Rendering plot...")
   })
@@ -311,16 +334,16 @@ server <- function(input,output, session) {
   
   
   ## Capture the selected points on the graph
-  selectedPoints <- reactive({
-    user_brush <- input$user_brush
-    pts <- brushedPoints(getTimeFilteredCategoryDataset(), user_brush, xvar = "date", yvar = "value")
-    if(is.null(pts)) return(NULL)
-    if(hasCategories()){
-      pts %>% select(date, category, value)
-    } else {
-      pts %>% select(date, value)
-    }
-  })
+  #selectedPoints <- reactive({
+  #  user_brush <- input$user_brush
+  #  pts <- brushedPoints(getTimeFilteredCategoryDataset(), user_brush, xvar = "date", yvar = "value")
+  #  if(is.null(pts)) return(NULL)
+  #  if(hasCategories()){
+  #    pts %>% select(date, category, value)
+  #  } else {
+  #    pts %>% select(date, value)
+  #  }
+  #})
   
   ## Plot showing all categories
   output$allplot <- renderPlot({

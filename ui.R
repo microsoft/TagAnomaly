@@ -63,6 +63,8 @@ body <- dashboardBody(
              h2('Time Series for labeling:'),
              h5("Graph might take a few moments to load"),
              plotOutput("plot", brush = "user_brush"),
+             actionButton("add", "Add selected points"),
+             actionButton("delete", "Remove selected points"),
              h2('Selected points:'),
              dataTableOutput("summaryTable"),
              h2('Inspect raw data:'),
