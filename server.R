@@ -23,7 +23,9 @@ server <- function(input,output, session) {
   numericTimestamp <- reactiveVal(value = F,label = 'numericTimestamp')
   
   selectedPoints <- reactiveVal(value = data.frame(),label='selectedPoints')
-  brushed <- reactive(brushedPoints(getTimeFilteredCategoryDataset(), input$user_brush))
+  brushed <- reactive({
+      brushedPoints(getTimeFilteredCategoryDataset(), input$user_brush)
+    })
   
   observeEvent(input$add, {
     selectedPoints(selectedPoints() %>% bind_rows(brushed()))
@@ -33,10 +35,6 @@ server <- function(input,output, session) {
     if (dim(selectedPoints())[1] > 0) {
       selectedPoints(selectedPoints()%>% anti_join(brushed()))
     }
-  })
-  
-  observeEvent(input$category,{
-    brushed(NULL)
   })
   
   ####---- Time-Series data handling ----####
@@ -175,6 +173,9 @@ server <- function(input,output, session) {
     if(is.null(dataset)) return(NULL)
     if(is.null(input$slider)) return(NULL)
     
+    
+    session$resetBrush("input$user_brush")
+    selectedPoints(data.frame())
     dataset %>% filter(date >= input$slider[1], date <= input$slider[2])
   })
   
@@ -293,6 +294,7 @@ server <- function(input,output, session) {
   
   ## Select input for categories, based on the categories found in the time series dataset
   output$category <- renderUI({
+    
     if(hasCategories()==TRUE){
       req(input$timeseriesfile)
       dataset <- getTimeSeriesDataset()
@@ -329,22 +331,7 @@ server <- function(input,output, session) {
       g
     },message = "Rendering plot...")
   })
-  
-  
-  
-  
-  ## Capture the selected points on the graph
-  #selectedPoints <- reactive({
-  #  user_brush <- input$user_brush
-  #  pts <- brushedPoints(getTimeFilteredCategoryDataset(), user_brush, xvar = "date", yvar = "value")
-  #  if(is.null(pts)) return(NULL)
-  #  if(hasCategories()){
-  #    pts %>% select(date, category, value)
-  #  } else {
-  #    pts %>% select(date, value)
-  #  }
-  #})
-  
+
   ## Plot showing all categories
   output$allplot <- renderPlot({
     
