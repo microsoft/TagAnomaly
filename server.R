@@ -12,7 +12,9 @@ options(shiny.maxRequestSize=150*1024^2)
 ## Shiny server function
 server <- function(input,output, session) {
   
-  ## Reactive values
+  ####---- Reactive values ---####
+  
+  
   # A boolean checking if the provided dataset contains multiple categories or not. This affects the UI
   hasCategories <- reactiveVal(value = T,label='hasCategories')
   
@@ -27,20 +29,41 @@ server <- function(input,output, session) {
       brushedPoints(getTimeFilteredCategoryDataset(), input$user_brush)
     })
   
+  #### Event observers ####
+  
+  # Update selected points when the user clicks 'Add'
   observeEvent(input$add, {
     selectedPoints(selectedPoints() %>% bind_rows(brushed()))
   })
   
+  # Update selected points when the user clicks 'Remove'
   observeEvent(input$delete, {
     if (dim(selectedPoints())[1] > 0) {
       selectedPoints(selectedPoints()%>% anti_join(brushed()))
     }
   })
   
-  ####---- Time-Series data handling ----####
+  ####---- Time-Series data injestion and handling ----####
   
-  ## Read CSV input file
+  
+  getDataset <- reactive({
+    ## Get time-series dataset from file upload
+    
+    if(is.null(input$timeseriesfile)) return(NULL)
+    dataset <- tryReadFile()
+    
+    
+    validate(
+      need(nrow(dataset) > 0, "Input file is empty"),
+      need(('date' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to date"),
+      need(('value' %in% names(dataset)),"value column not found. Consider renaming your value column to value")
+      
+    )
+    dataset
+  })  
+
   tryReadFile <- function() {
+    ## Read CSV input file from the user provided path
     out <- tryCatch(
       {
         read.csv(input$timeseriesfile$datapath,stringsAsFactors = F)
@@ -60,6 +83,7 @@ server <- function(input,output, session) {
   }
   
   padMissingDates <- function(dataset,padValue = 0, timeSeriesGapValue){
+    ## Interpolate missing time/date values
     category <- dataset[1,'category'] %>% unlist()
     
     pad <- data.frame(date = seq(from = min(dataset$date),to = max(dataset$date),by = timeSeriesGapValue))
@@ -73,25 +97,12 @@ server <- function(input,output, session) {
     
     dataset
   }
-  
-  ## Get time-series dataset from file upload
-  getDataset <- reactive({
-    
-    if(is.null(input$timeseriesfile)) return(NULL)
-    dataset <- tryReadFile()
-    
-    
-    validate(
-      need(nrow(dataset) > 0, "Input file is empty"),
-      need(('date' %in% names(dataset)),"date column not found. Consider renaming your timestamp column to date"),
-      need(('value' %in% names(dataset)),"value column not found. Consider renaming your value column to value")
-      
-    )
-    dataset
-  })
+
   
   
   getTimeSeriesDataset <- reactive({
+    ### Turn dataset into a time series by transforming the date column into POSIXct.
+    ### If dataset is numeric, turn numericTimestamp flag to TRUE.
     dataset <- getDataset()
     if(is.null(dataset)) return(NULL)
     
@@ -137,8 +148,9 @@ server <- function(input,output, session) {
     dataset
   })
   
-  ## Get a dataset for a specific category
+
   getCategoryDataset <- reactive({
+    ## Get a dataset for a specific category
     ts <- getTimeSeriesDataset()
     if(is.null(ts)) return(NULL)
     
@@ -158,8 +170,9 @@ server <- function(input,output, session) {
     dataset
   })
   
-  ## Get the entire dataset, filtered by the slider range
+
   getTimeFilteredDataset <- reactive({
+    ## Get the entire dataset, filtered by the slider range
     dataset <- getTimeSeriesDataset()
     if(is.null(dataset)) return(NULL)
     if(is.null(input$slider)) return(NULL)
@@ -167,8 +180,9 @@ server <- function(input,output, session) {
     dataset %>% filter(date >= input$slider[1], date <= input$slider[2])
   })
   
-  ## Get category dataset, filtered by the slider range
+
   getTimeFilteredCategoryDataset <- reactive({
+    ## Get category dataset, filtered by the slider range
     dataset <- getCategoryDataset()
     if(is.null(dataset)) return(NULL)
     if(is.null(input$slider)) return(NULL)
@@ -181,9 +195,11 @@ server <- function(input,output, session) {
   
   ####---- Raw data handling ----####
   
-  ## Get raw data (an additional dataset for which the time-series dataset is an aggregation)
-  ## See R/create_sample_data.R for a script that creates demo time-series and raw datasets
+
   getRawData <- reactive({
+    ## Get raw data (an additional dataset for which the time-series dataset is an aggregation)
+    ## See R/create_sample_data.R for a script that creates demo time-series and raw datasets
+    
     cate <- input$category
     
     if(is.null(input$rawfile)) return(NULL)
@@ -210,8 +226,9 @@ server <- function(input,output, session) {
     raw
   })
   
-  ## get raw data for a sample selected by the user
+
   getRawDataForSample <- reactive({
+    ## get raw data for a sample selected by the user
     lastclicked <- input$summaryTable_rows_selected
     if(is.null(lastclicked)) return(NULL)
     
@@ -468,6 +485,7 @@ server <- function(input,output, session) {
   ####---- Data output ----####
   
   ## download selected points
+  
   output$mydownload <- downloadHandler(
     filename = function(){
       random_string <- paste0(paste0(sample(LETTERS,2 , TRUE),collapse=''),sample(999, 1, TRUE), paste0(sample(LETTERS,2 , TRUE),collapse=''),collapse = '')
@@ -477,9 +495,9 @@ server <- function(input,output, session) {
       } else{
         paste0(gsub(".csv",replacement = "",input$timeseriesfile$name),'-',random_string,'-labels.csv')
       }
-    },
-    content = function(file) {
+    }, content = function(file) {
       write.csv(selectedPoints(),file)
     }
   )
+  
 }

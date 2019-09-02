@@ -23,10 +23,11 @@ header <- dashboardHeader(title = 'Taganomaly - Anomaly detection labeling tool'
                           - value</P><P></P><P>
                 <B>2. Select category</B> (if exists)</P><P>
                 <B>3. Select time range on slider</B></P><P>
-                <B>4.Select points on plot that look anomalous</B>.
-                <BR>Optional (1): click on one time range on the table below the plot to see raw data on this time range
-                <BR>Optional (2): Open the "All Categories" tab to see how other time series behave on the same time range.
-                <BR><B>5.</B> Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.</P>'
+                <B>4.Select points on plot</B> that look anomalous.</P><P>
+                <B>5. Click "Add selected points"</B> to add the marked points to the candidate list.</P><P>
+b                <BR>Optional (1): click on one time range on the table below the plot to see raw data on this time range
+                <BR>Optional (2): Open the "All Categories" tab to see how other time series behave on the same time range.<P>
+                <B>7.</B> Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.</P>'
                               )))
 )
 
@@ -65,7 +66,7 @@ body <- dashboardBody(
              plotOutput("plot", brush = "user_brush"),
              actionButton("add", "Add selected points"),
              actionButton("delete", "Remove selected points"),
-             h2('Selected points:'),
+             h2('Currently marked points:'),
              dataTableOutput("summaryTable"),
              h2('Inspect raw data:'),
              h5('Select a point or more on the graph, then select a record on the \"Selected Points\" table to see raw data'),
