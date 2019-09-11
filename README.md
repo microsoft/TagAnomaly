@@ -74,29 +74,34 @@ Which would result in the shiny server app running on port 3838.
 
 ## Instructions of use
 1. Import time series CSV file. Assumed structure:
-- date (`"%Y-%m-%d %H:%M:%S"`). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
-- category (optional)
+- date ("%Y-%m-%d %H:%M:%S")
+- category
 - value
 
-2. (Optional) Import raw data time series CSV file.
-
-If the original time series is an aggreation over time windows, this time series is the raw values themselves. This way we could dive deeper into an anomalous value and see what it is comprised of.
+2. (Optional) Import raw data time series CSV file. If the original time series is an aggreation over time windows, this time series is the raw values themselves. This way we could dive deeper into an anomalous value and see what it is comprised of.
 Assumed structure:
-- date (`"%Y-%m-%d %H:%M:%S"`). TagAnomaly will attempt to infer the date from other patterns as well, using the *parsedate* package
-- category (optional)
-- content
+- date ("%Y-%m-%d %H:%M:%S")
+- category
+- value
 
-2. Select category (optional, if exists)
+2. Select category (if exists)
 
 3. Select time range on slider
 
-4. Select points on plot that look anomalous.
-Optional (1): click on one time range on the table below the plot to see raw data on this time range
-Optional (2): Open the `All Categories` tab to see how other time series behave on the same time range.
-5. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on `Download labels set` and continue to the next category.
+4. Inspect your time series:
+(1): click on one time range on the table below the plot to see raw data on this time range
+(2): Open the "All Categories" tab to see how other time series behave on the same time range.
+
+4.Select points on plot that look anomalous.
+
+5. Click "Add selected points" to add the marked points to the candidate list.
+
+7. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.
 
 #### Current limitations/issues
-It is currently impossible to have multiple selections on one plot. A workaround is to select one area, download the csv and select the next area. Each downloaded CSV has a random string so files won't override each other. Once labeling is finished, one option is to run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
+Points added but not saved will be lost in case the date slider or categories are changed, hence it is difficult to save multiple points from a complex time series. Once all segments are labeled, one can run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
+
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
