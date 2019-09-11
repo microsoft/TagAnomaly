@@ -51,9 +51,7 @@ sidebar <- dashboardSidebar(
     uiOutput("category"),
     checkboxInput('interpolate',label = "Interpolate missing points",value = FALSE),
     selectInput('breaks',"Select graph breaks",choices = c('1 sec','1 min','1 hour','1 day','1 week','1 month','1 year'),selected = '1 year'),
-    uiOutput('slider'),
-    
-    downloadButton(outputId = "mydownload", label = "Download labels set")
+    uiOutput('slider')
   )
 )
 
@@ -68,6 +66,7 @@ body <- dashboardBody(
              actionButton("delete", "Remove selected points"),
              h2('Currently marked points:'),
              dataTableOutput("summaryTable"),
+             downloadButton(outputId = "mydownload", label = "Download labels set"),
              h2('Inspect raw data:'),
              h5('Select a point or more on the graph, then select a record on the \"Selected Points\" table to see raw data'),
              dataTableOutput("rawtable")
