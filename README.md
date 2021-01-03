@@ -35,7 +35,7 @@ This could be useful to understand whether an anomaly was univariate or multivar
 ## How to run locally:
 This tool uses the [shiny framework](https://shiny.rstudio.com/) for visualizing events.
 In order to run it, you need to have [R](https://mran.microsoft.com/download) and preferably [Rstudio](https://www.rstudio.com/products/rstudio/download/).
-Once you have everything installed, open the project on R studio and click `Run App`, or call runApp() from the console. You might need to manually install the required packages
+Once you have everything installed, open the project ([taganomaly.Rproj](taganomaly/taganomaly.Rproj)) on R studio and click `Run App`, or call runApp() from the console. You might need to manually install the required packages
 
 #### Requirements
 - R (3.4.0 or above)
