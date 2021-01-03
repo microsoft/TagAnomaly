@@ -1,38 +1,63 @@
 # taganomaly
 Anomaly detection labeling tool, specifically for multiple time series (one time series per category).
 
-## Note: 
-**This tool was built as a part of an [engagement](https://www.microsoft.com/developerblog/2019/01/02/real-time-time-series-analysis-at-scale-for-trending-topics-detection/), and is not maintained on a regular basis.**
-
 Taganomaly is a tool for creating labeled data for anomaly detection models. It allows the labeler to select points on a time series, further inspect them by looking at the behavior of other times series at the same time range, or by looking at the raw data that created this time series (assuming that the time series is an aggregated metric, counting events per time range)
 
-#### Click here to deploy on Azure using [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/):
+:exclamation: **Note: This tool was built as a part of a [customer engagement](https://www.microsoft.com/developerblog/2019/01/02/real-time-time-series-analysis-at-scale-for-trending-topics-detection/), and is not maintained on a regular basis.**
+
+
+Click here to deploy on Azure using [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/):
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/omri374/taganomaly)
 
+## Table of contents
+
+- [Using the app](#using-the-app)
+  * [The labeling window](#the-labeling-window)
+    + [Time series labeling](#time-series-labeling)
+    + [Selected points table view](#selected-points-table-view)
+    + [View raw data for window (if exists)](#view-raw-data-for-window-if-exists)
+  * [Compare this category with others over time](#compare-this-category-with-others-over-time)
+  * [Find proposed anomalies using the Twitter AnomalyDetection package](#find-proposed-anomalies-using-the-twitter-anomalydetection-package)
+  * [Observe the changes in distribution between categories](#observe-the-changes-in-distribution-between-categories)
+- [How to run locally](#how-to-run-locally)
+  * [using R](#using-r)
+  * [Using Docker](#using-docker)
+- [How to deploy using docker](#how-to-deploy-using-docker)
+  * [Deploy to Azure](#deploy-to-azure)
+  * [Pull the image manually](#pull-the-image-manually)
+- [Building from source](#building-from-source)
+- [Instructions of use](#instructions-of-use)
+- [Current limitations](#current-limitations)
+- [Contributing](#contributing)
+
+## Using the app
 The app has four main windows:
-### 1. The labeling window
+### The labeling window
 ![UI](https://github.com/Microsoft/taganomaly/raw/master/assets/ui.png)
-###### Time series labeling
+#### Time series labeling
 ![Time series](https://github.com/Microsoft/taganomaly/raw/master/assets/ts.png)
 
-###### Selected points table view
+#### Selected points table view
 ![Selected points](https://github.com/Microsoft/taganomaly/raw/master/assets/selected.png)
 
-###### View raw data for window (if exists)
+#### View raw data for window if exists
 ![Detailed data](https://github.com/Microsoft/taganomaly/raw/master/assets/detailed.png)
 
 
-### 2. Compare this category with others over time
+### Compare this category with others over time
 ![Compare](https://github.com/Microsoft/taganomaly/raw/master/assets/compare.png)
 
-### 3. Find proposed anomalies using the Twitter AnomalyDetection package
+### Find proposed anomalies using the Twitter AnomalyDetection package
 ![Reference results](https://github.com/Microsoft/taganomaly/raw/master/assets/twitter.png)
 
-### 4. Observe the changes in distribution between categories
+### Observe the changes in distribution between categories
 This could be useful to understand whether an anomaly was univariate or multivariate
 ![Distribution comparison](https://github.com/Microsoft/taganomaly/raw/master/assets/dist.png)
 
-## How to run locally:
+## How to run locally
+
+### using R
+
 This tool uses the [shiny framework](https://shiny.rstudio.com/) for visualizing events.
 In order to run it, you need to have [R](https://mran.microsoft.com/download) and preferably [Rstudio](https://www.rstudio.com/products/rstudio/download/).
 Once you have everything installed, open the project ([taganomaly.Rproj](taganomaly/taganomaly.Rproj)) on R studio and click `Run App`, or call runApp() from the console. You might need to manually install the required packages
@@ -49,12 +74,31 @@ Once you have everything installed, open the project ([taganomaly.Rproj](taganom
 - shinythemes
 - AnomalyDetection
 
-## How to deploy using docker:
-Option 1: [Deploy to Azure Web App for Containers or Azure Container Instances](https://azuredeploy.net/). More details [here (webapp)](https://azure.microsoft.com/en-us/services/app-service/containers/) and [here (container instances)](https://azure.microsoft.com/en-us/services/container-instances/)
+### Using Docker
 
-Option 2: Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
+Pull the image from Dockerhub:
 
-### Dockerize the shiny app:
+```sh
+docker pull omri374/taganomaly
+```
+
+Run:
+
+```sh
+docker run --rm -p 3838:3838 omri374/taganomaly
+```
+
+## How to deploy using docker
+
+### Deploy to Azure
+
+[Deploy to Azure Web App for Containers or Azure Container Instances](https://azuredeploy.net/). More details [here (webapp)](https://azure.microsoft.com/en-us/services/app-service/containers/) and [here (container instances)](https://azure.microsoft.com/en-us/services/container-instances/)
+
+### Pull the image manually
+
+Deploy [this image](https://hub.docker.com/r/omri374/taganomaly/) to your own environment.
+
+## Building from source
 In order to build a new Docker image, run the following commands from the root folder of the project:
 
 ```sh
@@ -98,11 +142,11 @@ Assumed structure:
 
 7. Once you decide that these are actual anomalies, save the resulting table to csv by clicking on "Download labels set" and continue to the next category.
 
-#### Current limitations/issues
+## Current limitations
 Points added but not saved will be lost in case the date slider or categories are changed, hence it is difficult to save multiple points from a complex time series. Once all segments are labeled, one can run the provided [prep_labels.py](https://github.com/Microsoft/TagAnomaly/blob/master/prep_labels.py) file in order to concatenate all of TagAnomaly's output file to one CSV.
 
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
