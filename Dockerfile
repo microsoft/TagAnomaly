@@ -1,12 +1,12 @@
-FROM rocker/shiny:3.5.1
+FROM rocker/shiny:3.6.1
 
 RUN apt-get update &&\
-   apt-get install libcurl4-openssl-dev libv8-3.14-dev libssl-dev libxml2-dev -y &&\
+   apt-get install build-essential libcurl4-gnutls-dev libv8-3.14-dev libssl-dev libxml2-dev libgit2-dev -y &&\
    mkdir -p /var/lib/shiny-server/bookmarks/shiny
 
 
-RUN R -e "install.packages('devtools', repos='http://cran.rstudio.com')"
-	
+RUN R -e "install.packages('devtools')"
+
 RUN R -e "install.packages(c('shiny', 'shinydashboard','DT','dplyr','ggplot2','gridExtra','shinythemes','parsedate','remotes'), repos='http://cran.rstudio.com/')" && \
     R -e "remotes::install_github('twitter/AnomalyDetection')"
 
