@@ -6,9 +6,6 @@ Taganomaly is a tool for creating labeled data for anomaly detection models. It 
 :exclamation: **Note: This tool was built as a part of a [customer engagement](https://www.microsoft.com/developerblog/2019/01/02/real-time-time-series-analysis-at-scale-for-trending-topics-detection/), and is not maintained on a regular basis.**
 
 
-Click here to deploy on Azure using [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/):
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/omri374/taganomaly)
-
 ## Table of contents
 
 - [Using the app](#using-the-app)
